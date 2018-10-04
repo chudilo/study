@@ -2,7 +2,7 @@
 
 struct word{
   int len;
-  char ptr[21];// = NULL;
+  char ptr[1000];// = NULL;
 };
 
 int get_word(char* word_ptr);
