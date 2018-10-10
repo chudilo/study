@@ -14,9 +14,6 @@ int levDist(word word1,word word2) {
   else if(word2.len == 0)
     return word1.len;
 
-  else if(!strcmp(word1.ptr,word2.ptr))
-    return 0;
-
   else {
     int m = word1.len+1, n = word2.len+1;
 
@@ -24,8 +21,6 @@ int levDist(word word1,word word2) {
 
     for(int i = 0; i < m; i++) {
       int *row = (int*) malloc(sizeof(int) * n);
-      //for(int j = 0; j < n; j++)
-      //  LevRow[j] = j;
 
       matrix[i] = row;
     }
@@ -44,8 +39,8 @@ int levDist(word word1,word word2) {
         top = matrix[i-1][j];
         left = matrix[i][j-1];
         diag = matrix[i-1][j-1];
-        tmp = (top+1 < left+1 ? top+1 : left+1);
-        matrix[i][j] = tmp < diag+cost ? tmp : diag+cost;
+        matrix[i][j] = min(min(top+1, left+1),
+								diag+cost);
       }
 
     //for(int i = 0; i < m; i++) {
