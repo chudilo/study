@@ -4,7 +4,16 @@
 
 #include "distfunc.h"
 
+
 using namespace std;
+/*
+word::word() {
+  word::ptr = (char*) malloc(sizeof(char)*1000);
+}
+
+word::~word() {
+  free(word::ptr);
+}*/
 
 int levDist(word word1,word word2) {
 
@@ -43,12 +52,7 @@ int levDist(word word1,word word2) {
 								diag+cost);
       }
 
-    //for(int i = 0; i < m; i++) {
-      //for(int j = 0; j < n; j++)
-        //printf("%-4.1d",matrix[i][j]);
-      //puts("");
-    //}
-
+    //printInfoMatrix(matrix, m, n);
     int res = matrix[m-1][n-1];
 
     for(int i = 0; i < m; i++)
@@ -116,13 +120,8 @@ int damDist(word word1, word word2) {
           matrix[i][j] = min(min(top+1,left+1),diag+cost);
 
       }
-    /*
-    for(int i = 0; i < m; i++) {
-      for(int j = 0; j < n; j++)
-        printf("%-4.1d",LevMatr[i][j]);
-      puts("");
-    }
-    */
+
+    //printInfoMatrix(matrix, m, n);
     int res = matrix[m-1][n-1];
 
     for(int i = 0; i < m; i++)
@@ -308,4 +307,18 @@ double getCPUTime( )
 #endif
 
     return -1;      /* Failed. */
+}
+
+void printInfoWords(word word1, word word2) {
+  printf("word1.len = %d, word2.len = %d\n", word1.len, word2.len);
+  puts(word1.ptr);
+  puts(word2.ptr);
+}
+
+void printInfoMatrix(int **matrix, int m, int n) {
+  for(int i = 0; i < m; i++) {
+    for(int j = 0; j < n; j++)
+      printf("%-4.1d",matrix[i][j]);
+    puts("");
+  }
 }
