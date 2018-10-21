@@ -1,32 +1,56 @@
 #include <cstdio>
+#include <cstdlib>
+#include <algorithm>    // std::swap
 
-//#include "matrix_func.h"
-#include "get_time.h"
+#include <vector>
+#include <ctime>
 
-//#define SIZE 1000
-#define TIMES 10
+using namespace std;
+
+template <typename T>
+void combSort(vector<T> &sort)
+{
+  int n = 0; // количество перестановок
+  double fakt = 1.2473309; // фактор уменьшения
+  double step = sort.size() - 1;
+
+  while (step >= 1) {
+    for (int i = 0; i + step < sort.size(); ++i)
+      if (sort[i] > sort[i + step])
+        swap(sort[i], sort[i + step]);
+
+    step /= fakt;
+  }
+
+  for (int i = 0; i < sort.size() - 1; i++) {
+    bool swapped = false;
+    for (int j = 0; j < sort.size() - i - 1; j++)
+      if (sort[j] > sort[j + 1]) {
+        swap(sort[j], sort[j + 1]);
+        swapped = true;
+      }
+
+    if (!swapped)
+      break;
+  }
+}
 
 int main() {
+	std::srand(std::time(0)); //use current time as seed for random generator
 
-	for(int i = 0; i < 20; i++) {
-		int SIZE = 100 + i*100;
+	for(int i = 0; i < 1; i++) {
+		int vsize = 100 + i*100;
 
-		double t1, t2, restimeMult = 0, restimeVin = 0, restimeVinUpgr = 0;
+		vector<int> v_orig(vsize), v_sorted(vsize);
 
-		for(int j = 0; j < TIMES; j++) {
-			
-			t1 =  getCPUTime( );
-			
-			t2 =  getCPUTime( );
+		for(int i = 0; i < vsize; i++)
+			v_orig[i] = std::rand()%10;
+		v_sorted = v_orig;
+		//printf("%d and %d\n", v_orig[7],v_sorted_ref[7]);
 
-			restimeMult += (t2-t1);
+		combSort(v_sorted);
 
-		}
-
-		printf("Proc time for %d elements casual mult :\n%f\n", SIZE, restimeMult/TIMES);
-		printf("Proc time for %d elements Vinograd mult :\n%f\n", SIZE, restimeVin/TIMES);
-		printf("Proc time for %d elements upgrade Vinograd mult:\n%f\n",SIZE, restimeVinUpgr/TIMES);
-		puts("");
-
+		for(int i = 0; i < v_sorted.size(); i++)
+			printf("%d ", v_sorted[i]);
 	}
 }
