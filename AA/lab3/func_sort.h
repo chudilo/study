@@ -1,5 +1,24 @@
-template <typename T>
-void bubbleSort(vector<T> &vect);
+class BinaryTreeNode{
+public:
+  int value;
+  BinaryTreeNode *left_child;
+  BinaryTreeNode *right_child;
+  void insert(int val);
+  void print();
+  BinaryTreeNode(int val);
+};
 
-template <typename T>
-void combSort(vector<T> &sort);
+class BinaryTree{
+public:
+  BinaryTreeNode *head;
+
+  //void insert(int val);
+  void insert(int val);
+  void print();
+  BinaryTree();
+
+};
+
+void bubbleSort(int *vect, int size);
+
+void combSort(int *sort, int size);
