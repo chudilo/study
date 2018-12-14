@@ -9,12 +9,11 @@
 int main()
 {
 	int child_pids[CHILD_COUNT];
-	short int parent_flag = 1;
+	int parent_flag = 1;
+	char msg[32];
 
 	int stat;
 	pid_t res;
-
-	char msg[16];
 
 	for(int i = 0; i < CHILD_COUNT; i++)
 	{
@@ -36,7 +35,6 @@ int main()
 				parent_flag = 0;
 				break;
 			}
-
 	}
 
 	if(parent_flag)
@@ -54,12 +52,11 @@ int main()
 			res = wait(&stat);
 			if (WIFEXITED(stat))
 				printf("Parent: child %d finished with %d code.\n", res, WEXITSTATUS(stat) );
-				
+
 			else
 				printf("Parent: child finished abnormally.\n" );
 		}
-
 	}
-	return 0;
 
+	return 0;
 }

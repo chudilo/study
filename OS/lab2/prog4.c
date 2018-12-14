@@ -4,19 +4,17 @@
 #include <string.h> //strlen
 #include <sys/wait.h> //wait
 
-//СОздать адресное пространство для программы, которую передаются екзеку
-//Созд
 #define CHILD_COUNT  2
 
 int main()
 {
 	int child_pids[CHILD_COUNT];
-
-	short int parent_flag = 1;
-
+	int parent_flag = 1;
+	//char msg[32];
 	int descr[2];
-
-	char msg[] = "Hello world!";
+	int stat;
+	pid_t res;
+	char msg[32] = "Hello world!";
 
 	if (pipe(descr) == -1)
 	{
@@ -30,7 +28,6 @@ int main()
 
 		if(child_pids[i] == -1)
 			{
-				char msg[16];
 				sprintf( msg, "Fork %d failed", i+1);
 
 				perror(msg);
@@ -43,7 +40,6 @@ int main()
 
 				close( descr[0] );
 
-				char msg[32];
 				sprintf( msg, "Message from %d child\0", i+1);
 				write( descr[1], msg, strlen(msg)+1);
 
@@ -60,17 +56,13 @@ int main()
 		for(int i = 0; i < CHILD_COUNT; i++)
 		{
 			close( descr[1] );
-			char msg[64];
-			memset( msg, 0, 64 );
+			memset( msg, 0, 32);
 			int i = 0;
 
 			read(descr[0], msg, sizeof(msg));
 
 			printf("Parent: read <%s>\n", msg );
 		}
-
-		int stat;
-		pid_t res;
 
 		for(int i = 0; i < CHILD_COUNT; i++)
 		{
