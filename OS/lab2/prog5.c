@@ -7,14 +7,26 @@
 
 #define CHILD_COUNT  2
 
+int reading_flag(int* signum)
+{
+	static int r_flag = 0;
+	if(signum)
+		if(*signum == SIGINT)
+			r_flag = 1;
+
+	return r_flag;
+}
+
 int writing_flag(int* signum)
 {
-		static int sigint_flag = 0;
-		if(signum)
-			if(*signum == SIGINT)
-				sigint_flag = 1;
-
-		return sigint_flag;
+	static int w_flag = 0;
+	if(signum)
+		if(*signum == SIGINT)
+		{
+			reading_flag(signum);
+			w_flag = 1;
+		}
+	return w_flag;
 }
 
 void sigint_handler(int signum)
@@ -29,24 +41,30 @@ int main()
 {
 	int child_pids[CHILD_COUNT];
 	int parent_flag = 1;
-	char msg[64];
-	int descr[2];
+	char msg[] = "Message from child";
+
 	int stat;
 	pid_t res;
 
+	int descr[2];
+
+	int cycle_exit = 0;
+
 	if (pipe(descr) == -1)
 	{
-		perror( "couldn't pipe." );
+		sprintf( msg, "Pipe failed");
+
+		perror(msg);
 		exit(1);
 	}
 
-	for(int i = 0; i < CHILD_COUNT; i++)
+	for(int i = 0; i < CHILD_COUNT && !cycle_exit; i++)
 	{
 		child_pids[i] = fork();
 
 		if(child_pids[i] == -1)
 			{
-				sprintf( msg, "Fork %d failed", i+1);
+				sprintf( msg, "Fork failed");
 
 				perror(msg);
 				exit(1);
@@ -54,44 +72,28 @@ int main()
 
 		if(child_pids[i] == 0)
 			{
-
-				close(descr[0]);
-
-				signal(SIGINT, sigint_handler);
-
-				printf( "Child %d waiting for a SIGINT signal for writing\n", i+1);
-				sleep(3);
-
-				if(writing_flag(NULL))
-				{
-					sprintf( msg, "Message form %d child", i+1);
-					write(descr[1], msg, strlen(msg));
-				}
-
 				parent_flag = 0;
-				break;
+				cycle_exit = 1;
 			}
 
 	}
 	signal(SIGINT, sigint_handler);
 
-	printf( "Parent waiting for a SIGINT signal for reading\n");
-	sleep(3);
-
-	if(parent_flag)
+	if(!parent_flag)
 	{
-		puts("I am the parent");
-		for(int i = 0; i < CHILD_COUNT; i++)
+		printf( "Waiting for a SIGINT signal for writing\n");
+		sleep(3);
+
+		if(writing_flag(NULL))
 		{
-			close( descr[1] );
-			memset( msg, 0, 64 );
-			int i = 0;
-
-			while(read(descr[0], &(msg[i++]), 1) != '\0');
-
-			printf("Parent: read <%s>\n", msg );
+			close(descr[0]);
+			//sprintf( msg, "Message from child");
+			write(descr[1], msg, strlen(msg)+1);
 		}
-
+	}
+	else
+	{
+		printf( "Waiting for a SIGINT signal for reading\n");
 		for(int i = 0; i < CHILD_COUNT; i++)
 		{
 			res = wait( &stat );
@@ -102,6 +104,16 @@ int main()
 			else
 				printf("Parent: child finished abnormally.\n" );
 		}
+
+		if(reading_flag(NULL))
+			for(int i = 0; i < CHILD_COUNT; i++)
+			{
+				close( descr[1] );
+
+				read(descr[0], msg, sizeof(msg));
+
+				printf("Parent: read <%s>\n", msg );
+			}
 	}
 
 	return 0;

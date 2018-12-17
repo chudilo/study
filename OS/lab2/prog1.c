@@ -10,7 +10,9 @@ int main()
 	int parent_flag = 1;
   char msg[32];
 
-	for(int i = 0; i < CHILD_COUNT; i++)
+	int cycle_exit = 0;
+
+	for(int i = 0; i < CHILD_COUNT && !cycle_exit; i++)
 	{
 		child_pids[i] = fork();
 
@@ -28,7 +30,8 @@ int main()
 				printf( "Child%d: pid=%d;	group=%d;	parent=%d\n",i+1, getpid(), getpgrp(), getppid() );
 
 				parent_flag = 0;
-				break;
+				cycle_exit = 1;
+				//break;
 			}
 	}
 

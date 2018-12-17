@@ -8,30 +8,34 @@
 int main()
 {
 	int child_pids[CHILD_COUNT];
-	char *prog_list[CHILD_COUNT] = {"ps", "ls"};
 	char msg[32];
 	int parent_flag = 1;
+
 	int stat;
 	pid_t res;
-	
-	for(int i = 0; i < CHILD_COUNT; i++)
+
+	char *prog_list[] = {"ps", "ls"};
+
+	int cycle_exit = 0;
+
+	for(int i = 0; i < CHILD_COUNT && !cycle_exit; i++)
 	{
+		sleep(1);
 		child_pids[i] = fork();
 
 		if(child_pids[i] == -1)
-			{
+		{
+			sprintf( msg, "Fork %d failed", i+1);
 
-				sprintf( msg, "Fork %d failed", i+1);
-
-				perror(msg);
-				exit(1);
-			}
+			perror(msg);
+			exit(1);
+		}
 
 		if(child_pids[i] == 0)
 			{
-				sprintf( msg, "Message from %d child", i+1);
-
-				if(execlp(prog_list[i], prog_list[i], NULL, NULL ) == -1)
+				//sprintf( msg, "Message from %d child", i+1);
+				printf("\nChild%d, trying to exec %s process\n", i+1, prog_list[i]);
+				if(execlp(prog_list[i%2], prog_list[i%2], NULL, NULL ) == -1)
 				{
 					sprintf( msg, "Exec %d failed", i+1);
 
@@ -40,7 +44,7 @@ int main()
 				}
 
 				parent_flag = 0;
-				break;
+				cycle_exit = 1;
 			}
 	}
 

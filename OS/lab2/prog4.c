@@ -10,43 +10,48 @@ int main()
 {
 	int child_pids[CHILD_COUNT];
 	int parent_flag = 1;
-	//char msg[32];
-	int descr[2];
+	char msg[32];
+
 	int stat;
 	pid_t res;
-	char msg[32] = "Hello world!";
+
+	int descr[2];
+
+	int cycle_exit = 0;
 
 	if (pipe(descr) == -1)
 	{
-		perror( "couldn't pipe." );
+		sprintf( msg, "Pipe failed");
+
+		perror(msg);
 		exit(1);
 	}
 
-	for(int i = 0; i < CHILD_COUNT; i++)
+	for(int i = 0; i < CHILD_COUNT && !cycle_exit; i++)
 	{
+		sleep(1);
 		child_pids[i] = fork();
 
 		if(child_pids[i] == -1)
-			{
-				sprintf( msg, "Fork %d failed", i+1);
+		{
+			sprintf( msg, "Fork %d failed", i+1);
 
-				perror(msg);
-				exit(1);
-			}
+			perror(msg);
+			exit(1);
+		}
 
 		if(child_pids[i] == 0)
-			{
-				printf( "Child %d write a message\n", i+1);
+		{
+			printf( "Child %d write a message\n", i+1);
 
-				close( descr[0] );
+			close( descr[0] );
 
-				sprintf( msg, "Message from %d child\0", i+1);
-				write( descr[1], msg, strlen(msg)+1);
+			sprintf( msg, "Message from %d child\0", i+1);
+			write( descr[1], msg, strlen(msg)+1);
 
-				parent_flag = 0;
-
-				break;
-			}
+			parent_flag = 0;
+			cycle_exit = 1;
+		}
 
 	}
 
@@ -56,8 +61,6 @@ int main()
 		for(int i = 0; i < CHILD_COUNT; i++)
 		{
 			close( descr[1] );
-			memset( msg, 0, 32);
-			int i = 0;
 
 			read(descr[0], msg, sizeof(msg));
 

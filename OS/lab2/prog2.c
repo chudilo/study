@@ -15,7 +15,9 @@ int main()
 	int stat;
 	pid_t res;
 
-	for(int i = 0; i < CHILD_COUNT; i++)
+	int cycle_exit = 0;
+	
+	for(int i = 0; i < CHILD_COUNT && !cycle_exit; i++)
 	{
 		child_pids[i] = fork();
 
@@ -33,7 +35,7 @@ int main()
 				printf( "Child%d: pid=%d;	group=%d;	parent=%d\n",i+1, getpid(), getpgrp(), getppid() );
 
 				parent_flag = 0;
-				break;
+				cycle_exit = 1;
 			}
 	}
 
@@ -51,10 +53,10 @@ int main()
 		{
 			res = wait(&stat);
 			if (WIFEXITED(stat))
-				printf("Parent: child %d finished with %d code.\n", res, WEXITSTATUS(stat) );
+				printf("Parent: process %d finished with %d code.\n", res, WEXITSTATUS(stat) );
 
 			else
-				printf("Parent: child finished abnormally.\n" );
+				printf("Parent: process %d finished abnormally.\n", res);
 		}
 	}
 
