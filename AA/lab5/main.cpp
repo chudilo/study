@@ -1,30 +1,33 @@
-#include <time.h>
-#include <stdlib.h>
-#include <vector>
-#include <exception>
-#include <random>
 #include <stdio.h>
-#include <thread>
+#include <time.h>
 
 #include "matrix.h"
 
+#define COUNT_OF_THREADS 8
+
 int main() {
 
-	printf("start\n");
+	printf("Algorythm Analisis; Program 5 - threading\n");
 	//create 2 matrix
-	int matrix_size = 3;
+	int matrix_size = 1001;
 	Matrix A(matrix_size, matrix_size);
 	Matrix B(matrix_size, matrix_size);
-
-	A.Print();
-	B.Print();
+	Matrix res(matrix_size, matrix_size);
+	//A.Print();
+	//B.Print();
 
 	//for 1 to 20 threads//
 	printf("Time for CASUAL and VINOGRAD multiply\n");
 
-	for(int i = 0; i < 20; i++)
-		printf("|  %d  |  %d  |\n",0,0);
-
+	time_t res_time;
+	for(int i = 0; i < COUNT_OF_THREADS; i++) {
+			res.FillByZero();
+			//res.Print();
+			printf("%d threads\n", i+1);
+			res_time = casualMultiplyThreads(res, A, B, i+1);
+			//res.Print();
+	}
+			//puts("Hi");
 	//return time - multiply casual
 	//return time - multiply vinograd
 
