@@ -25,5 +25,6 @@ private:
 
 //Matrix casualMultiply(Matrix A, Matrix B);
 double casualMultiplyThreads(Matrix &result, Matrix &A, Matrix &B, const int count_of_threads);
+double vinogradMultiplyThreads(Matrix &result, Matrix &A, Matrix &B, const int count_of_threads);
 
 #endif //MATRIX_H

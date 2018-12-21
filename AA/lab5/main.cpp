@@ -19,7 +19,8 @@ int main() {
 	//for 1 to 20 threads//
 	printf("Time for CASUAL and VINOGRAD multiply\n");
 
-	time_t res_time;
+	double res_time;
+
 	for(int i = 0; i < COUNT_OF_THREADS; i++) {
 			res.FillByZero();
 			//res.Print();
@@ -27,6 +28,15 @@ int main() {
 			res_time = casualMultiplyThreads(res, A, B, i+1);
 			//res.Print();
 	}
+
+	for(int i = 0; i < COUNT_OF_THREADS; i++) {
+			res.FillByZero();
+			//res.Print();
+			printf("%d threads\n", i+1);
+			res_time = vinogradMultiplyThreads(res, A, B, i+1);
+			//res.Print();
+	}
+
 			//puts("Hi");
 	//return time - multiply casual
 	//return time - multiply vinograd
