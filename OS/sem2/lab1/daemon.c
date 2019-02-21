@@ -34,19 +34,10 @@ int main()
     }
 }
 
-int lockfile(int fd)
-{
-    struct flock fl;
-    fl.l_type = F_WRLCK;
-    fl.l_start = 0;
-    fl.l_whence = SEEK_SET;
-    fl.l_len = 0;
-    return(fcntl(fd, F_SETLK, &fl));
-}
-
 int already_running(void)
 {
-    syslog(LOG_WARNING, "Проверка на многократный запуск! Проверка Errno = %s", strerror(errno));
+    syslog(LOG_WARNING, "Проверка на многократный запуск!");
+
 
     int fd;
     char buf[16];
@@ -65,18 +56,20 @@ int already_running(void)
     if (errno == EWOULDBLOCK) {
         syslog(LOG_ERR, "%d невозможно установить блокировку на %s: %s!", errno, LOCKFILE, strerror(errno));
         close(fd);
-        exit(1);
+
+        return -1;
     }
+    else {
+        syslog(LOG_WARNING, "Записываем PID! %d Errno = %s", res, strerror(errno));
 
-    syslog(LOG_WARNING, "Записываем PID! %d Errno = %s", res, strerror(errno));
+        ftruncate(fd, 0);
+        sprintf(buf, "%ld", (long)getpid());
+        write(fd, buf, strlen(buf) + 1);
 
-    ftruncate(fd, 0);
-    sprintf(buf, "%ld", (long)getpid());
-    write(fd, buf, strlen(buf) + 1);
+        syslog(LOG_WARNING, "Записали PID!");
 
-    syslog(LOG_WARNING, "Записали PID!");
-
-    return 0;
+        return 0;
+    }
 }
 
 void daemonize(const char *cmd)
@@ -107,11 +100,6 @@ void daemonize(const char *cmd)
     sa.sa_flags = 0;
     if (sigaction(SIGHUP, &sa, NULL) < 0)
         perror("Невозможно игнорировать сигнал SIGHUP!\n");
-
-    // if ((pid = fork()) < 0)
-    //     perror("Ошибка функции fork!\n");
-    // else if (pid != 0) //родительский процесс
-    //     exit(0);
 
     // 5. Назначить корневой каталог текущим рабочим каталогом,
     // чтобы впоследствии можно было отмонтировать файловую систему
