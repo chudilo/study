@@ -1,0 +1,1 @@
+cmd_/home/parallels/Desktop/export-data/md2.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/parallels/Desktop/export-data/md2.ko /home/parallels/Desktop/export-data/md2.o /home/parallels/Desktop/export-data/md2.mod.o ;  true
